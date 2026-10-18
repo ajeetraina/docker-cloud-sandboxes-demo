@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
 # OpenCode: the open-source terminal coding agent, as a built-in cloud agent.
-# No web UI — you attach to a terminal session. Works with many providers.
+# No web UI - you attach to a terminal session. Works with many providers.
 #
-#   ./launch.sh [-n NAME] [-t TTL] [-s SIZE] [-k MIXIN_KIT] [-r REPO_URL] [-e KEY[=VALUE]]... [-A]
+#   ./launch.sh [-n NAME] [-t TTL] [-s SIZE] [-k KIT] [-r REPO_URL] [-e KEY[=VALUE]]... [-A]
 #
 #   -n NAME  sandbox name (default: opencode-demo)
 #   -t TTL   time to live, e.g. 2h, 90m (default: 4h; 24h hard cap)
 #   -s SIZE  micro|small|medium|large|xl (default: small = 2 vCPU / 4 GiB)
-#   -k KIT   optional mixin kit to layer on top (repeatable with more -k)
+#   -k KIT   optional kit to layer on top (repeatable with more -k)
 #   -r URL   public https git repo to clone into the sandbox
 #   -e VAR   env var, KEY=VALUE or bare KEY (copied from your shell); repeatable
 #   -A       attach to the agent session when it is ready (otherwise just print how)

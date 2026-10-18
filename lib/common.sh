@@ -1,5 +1,5 @@
 # Shared helpers for the docker-cloud-sandboxes-demo launchers.
-# Sourced by each demo's launch.sh — not meant to run on its own.
+# Sourced by each demo's launch.sh - not meant to run on its own.
 #
 # Every function here talks to Docker Cloud Sandboxes through `sbx --cloud`.
 # Keep it POSIX-friendly bash; the launchers run `set -euo pipefail`.
@@ -22,7 +22,7 @@ need_sbx() {
     || die "sbx not found. Install: https://docs.docker.com/ai/sandboxes/get-started/"
 }
 
-# cloud_preflight NAME — verify cloud access, and that NAME is not already taken.
+# cloud_preflight NAME - verify cloud access, and that NAME is not already taken.
 cloud_preflight() {
   local name=$1 existing
   log "Checking cloud sandbox access"
@@ -35,7 +35,7 @@ cloud_preflight() {
   fi
 }
 
-# size_resources SIZE — set CPUS and MEM globals from a t-shirt size.
+# size_resources SIZE - set CPUS and MEM globals from a t-shirt size.
 size_resources() {
   case $1 in
     micro)  CPUS=1;  MEM=2g  ;;
@@ -47,7 +47,7 @@ size_resources() {
   esac
 }
 
-# validate_env TOKEN — accept KEY=VALUE, or a bare KEY that exists in the shell.
+# validate_env TOKEN - accept KEY=VALUE, or a bare KEY that exists in the shell.
 validate_env() {
   local e=$1 key=${1%%=*}
   case $key in
@@ -58,7 +58,7 @@ validate_env() {
   fi
 }
 
-# repo_host URL — validate an https repo URL and echo its host (for --allow-network).
+# repo_host URL - validate an https repo URL and echo its host (for --allow-network).
 repo_host() {
   local url=$1 host
   case $url in https://*) ;; *) die "Repo must be an https:// URL (got '$url')." ;; esac
@@ -67,7 +67,7 @@ repo_host() {
   printf '%s' "$host"
 }
 
-# clone_into_home NAME REPO — clone a public repo into the sandbox user's $HOME.
+# clone_into_home NAME REPO - clone a public repo into the sandbox user's $HOME.
 # Echoes nothing; prints a note. Assumes the repo host is already allowed.
 clone_into_home() {
   local name=$1 repo=$2
@@ -77,7 +77,7 @@ clone_into_home() {
   note "Cloned into ~/$(basename "$repo" .git) in the sandbox."
 }
 
-# wait_http NAME PORT PATH — poll an in-sandbox HTTP endpoint for up to ~3 min.
+# wait_http NAME PORT PATH - poll an in-sandbox HTTP endpoint for up to ~3 min.
 # PATH empty  => success when the port answers at all (any HTTP status on /).
 # PATH set    => success only on a 2xx from that path.
 wait_http() {

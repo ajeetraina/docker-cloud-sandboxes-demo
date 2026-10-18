@@ -1,14 +1,13 @@
 # Claude (terminal agent) demo
 
-Launch a cloud sandbox running **Claude Code**, as a built-in cloud agent (a v3
-workload). No web UI — you attach to a terminal session.
+Launch a cloud sandbox running **Claude Code**, as a built-in cloud agent. No web UI - you attach to a terminal session.
 
 ```bash
 ./launch.sh                                   # create the sandbox, print how to attach
 ./launch.sh -A                                # create, then attach immediately
 ./launch.sh -n my-claude -t 2h -s medium
 ./launch.sh -r https://github.com/owner/repo.git     # clone a repo into the sandbox
-./launch.sh -k <mixin-ref>                           # layer a v3 mixin on top
+./launch.sh -k <kit-ref>                           # layer a kit on top
 ./teardown.sh
 ```
 

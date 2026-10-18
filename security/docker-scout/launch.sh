@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Docker Scout CLI (v3 mixin) on the docker-agent base (needs a docker CLI).
+# Docker Scout CLI on the docker-agent base (needs a docker CLI).
 # Adds 'docker scout' and scans a container image for CVEs.
 #
 #   ./launch.sh [-n NAME] [-t TTL] [-s SIZE] [-k KIT] [-i IMAGE] [-e KEY[=VALUE]]... [-S]
@@ -8,7 +8,7 @@
 #   -n NAME  sandbox name (default: docker-scout-demo)
 #   -t TTL   time to live, e.g. 2h, 90m (default: 4h; 24h hard cap)
 #   -s SIZE  micro|small|medium|large|xl (default: small = 2 vCPU / 4 GiB)
-#   -k KIT   kit reference (default: v3 docker-scout in ajeetraina/sbx-kits-scout)
+#   -k KIT   kit reference (default: docker-scout in ajeetraina/sbx-kits-scout)
 #   -i IMAGE image to scan with -S (default: alpine:latest)
 #   -e VAR   env var, KEY=VALUE or bare KEY (copied from your shell); repeatable
 #   -S       run 'docker scout cves IMAGE' after setup
@@ -42,7 +42,7 @@ for e in ${ENVS[@]+"${ENVS[@]}"}; do validate_env "$e"; EXTRA+=(--env "$e"); don
 
 cloud_preflight "$NAME"
 
-log "Creating cloud sandbox '$NAME' (docker-agent + docker-scout v3, $SIZE, ttl $TTL)"
+log "Creating cloud sandbox '$NAME' (docker-agent + docker-scout, $SIZE, ttl $TTL)"
 note "kit: $KIT"
 sbx --cloud run -d \
   --name "$NAME" --cpus "$CPUS" --memory "$MEM" --ttl "$TTL" \
@@ -50,14 +50,14 @@ sbx --cloud run -d \
 
 log "Verifying the Scout plugin is installed"
 sbx --cloud exec "$NAME" docker scout version 2>&1 | head -3 \
-  || warn "'docker scout version' failed — the base may lack a docker CLI."
+  || warn "'docker scout version' failed - the base may lack a docker CLI."
 
 if [ "$SCAN" -eq 1 ]; then
   log "Running docker scout cves $IMAGE"
   # Scout's API and Docker Hub need a docker login for full results / to avoid
   # rate limits. Non-zero exit means CVEs were found, which is expected.
   sbx --cloud exec "$NAME" docker scout cves "$IMAGE" \
-    || warn "docker scout exited non-zero (CVEs found, or not logged in — see README)."
+    || warn "docker scout exited non-zero (CVEs found, or not logged in - see README)."
 fi
 
 echo

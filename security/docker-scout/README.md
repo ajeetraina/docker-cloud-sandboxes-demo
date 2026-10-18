@@ -1,6 +1,6 @@
-# Docker Scout demo (v3 kit)
+# Docker Scout demo
 
-Launch a cloud sandbox with the **v3** `docker-scout` mixin from
+Launch a cloud sandbox with the `docker-scout` kit from
 [`ajeetraina/sbx-kits-scout`](https://github.com/ajeetraina/sbx-kits-scout),
 layered on the `docker-agent` base (which carries a docker CLI). It adds the
 `docker scout` plugin and scans a container **image** for CVEs.
@@ -40,5 +40,5 @@ docker scout cves alpine:latest
 sbx --cloud exec docker-scout-demo docker scout cves <image>
 ```
 
-`-S` exits non-zero when CVEs are found — expected. `./teardown.sh` deletes the
+`-S` exits non-zero when CVEs are found - expected. `./teardown.sh` deletes the
 sandbox when you are done.
