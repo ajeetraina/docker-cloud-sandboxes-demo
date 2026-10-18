@@ -3,7 +3,7 @@
 # Delete this demo's cloud sandbox.   ./teardown.sh [-n NAME]
 #
 set -euo pipefail
-NAME="${SBX_DEMO_NAME:-mend-ai-demo}"
+NAME="${SBX_DEMO_NAME:-claude-demo}"
 while getopts "n:h" opt; do
   case $opt in
     n) NAME=$OPTARG ;;
