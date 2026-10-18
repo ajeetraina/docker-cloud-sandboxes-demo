@@ -26,10 +26,13 @@ short.
 | [`agent-cli/opencode`](agent-cli/opencode) | OpenCode | `sbx --cloud attach` |
 | [`agent-cli/gemini`](agent-cli/gemini) | Gemini CLI | `sbx --cloud attach` |
 | [`security/docker-scout`](security/docker-scout) | Docker Scout CLI | scan an image |
+| [`agent-cli/codex-dhi`](agent-cli/codex-dhi) | Codex + DHI (one-shot recipe) | `sbx --cloud attach` |
 
 The four agents are built-in cloud agents. Docker Scout is the
 [`docker-scout`](https://github.com/ajeetraina/sbx-kits-scout) kit layered on
-the `docker-agent` base.
+the `docker-agent` base. `codex-dhi` is a recipe that wires several options at
+once (OpenAI + GitHub secrets, DHI MCP, Balanced + dhi.io egress, micro, 1h) to
+mirror the Agentic Platform's "Welcome" card.
 
 ```bash
 cd agent-cli/codex
