@@ -65,8 +65,42 @@ dhi_get_image_details   dhi_get_image_packages    dhi_get_image_cves
 dhi_get_image_attestations   dhi_list_mirrors   dhi_create_mirror   dhi_remove_mirror
 ```
 
-(The mirror-management tools need Docker Hub credentials via `X-Docker-Username`
-/ `X-Docker-Pat` headers; the rest work unauthenticated.)
+The `dhi_*_mirror` tools above are the exception: they need Docker Hub
+credentials. See the next section to enable them.
+
+## Enable the DHI mirror tools (authenticated)
+
+`dhi_list_mirrors`, `dhi_create_mirror`, and `dhi_remove_mirror` require Docker
+Hub credentials as `X-Docker-Username` / `X-Docker-Pat` HTTP headers. Rather than
+put the PAT inside the sandbox, the script has the **sbx proxy inject** both
+headers on requests to `dhi.io`, so the real PAT never enters the container.
+
+Opt in by exporting both vars before launch:
+
+```bash
+export DOCKER_USERNAME=your-dockerhub-user
+export DOCKER_PAT=dckr_pat_...        # a Docker Hub PAT with the scopes you need
+./launch.sh
+```
+
+The script then runs (only when both are set):
+
+```bash
+sbx --cloud secret set-custom --name dhi-mcp-user --host dhi.io \
+  --header X-Docker-Username --format '%s' --value "$DOCKER_USERNAME"
+sbx --cloud secret set-custom --name dhi-mcp-pat  --host dhi.io \
+  --header X-Docker-Pat      --format '%s' --value "$DOCKER_PAT"
+```
+
+Without those vars you still get all the read-only tools. Notes:
+
+- These are **global** custom secrets (they inject on every `dhi.io` request from
+  any sandbox). Remove them when done: `sbx --cloud secret rm -f dhi-mcp-user dhi-mcp-pat`.
+- `--value` places the PAT in the process args on your host (not in the sandbox).
+  To avoid even that, swap `--value "$DOCKER_PAT"` for `--ref op://...` (1Password)
+  or `--command <helper>`.
+- Codex still connects to `https://dhi.io/mcp` with no client-side auth; the proxy
+  adds the headers on the wire.
 
 **Open a new Codex session to see them.** `codex mcp add` writes
 `~/.codex/config.toml`, which Codex reads at session start — so the session that

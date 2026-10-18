@@ -16,6 +16,8 @@
 #
 # Secrets (openai, github) must exist BEFORE create; this script sets them from
 # $OPENAI_API_KEY / $GITHUB_TOKEN if they are missing and the var is exported.
+# Export DOCKER_USERNAME + DOCKER_PAT too to enable the DHI *mirror* tools
+# (the PAT is injected as an HTTP header by the proxy, never entering the sandbox).
 # Env overrides: SBX_DEMO_NAME, SBX_DEMO_TTL, SBX_DEMO_DHI_MCP
 
 set -euo pipefail
@@ -30,7 +32,7 @@ while getopts "n:t:M:Ge:Ah" opt; do
   case $opt in
     n) NAME=$OPTARG ;; t) TTL=$OPTARG ;; M) MCP=$OPTARG ;;
     G) WANT_GITHUB=0 ;; e) ENVS+=("$OPTARG") ;; A) ATTACH=1 ;;
-    h) sed -n '3,19p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;; *) exit 2 ;;
+    h) sed -n '3,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;; *) exit 2 ;;
   esac
 done
 
@@ -60,6 +62,22 @@ cloud_preflight "$NAME"
 log "Ensuring credentials (applied at create time)"
 ensure_secret openai OPENAI_API_KEY
 [ "$WANT_GITHUB" -eq 1 ] && ensure_secret github GITHUB_TOKEN
+
+# DHI mirror tools (dhi_list_mirrors, dhi_create_mirror, dhi_remove_mirror) need
+# Docker Hub creds as X-Docker-* headers. The proxy injects them on dhi.io, so
+# the PAT never enters the sandbox. Opt in by exporting DOCKER_USERNAME + DOCKER_PAT.
+if [ -n "${DOCKER_USERNAME:-}" ] && [ -n "${DOCKER_PAT:-}" ]; then
+  log "Enabling DHI mirror tools (proxy-injected X-Docker-* headers on dhi.io)"
+  sbx --cloud secret set-custom --name dhi-mcp-user --host dhi.io \
+    --header X-Docker-Username --format '%s' --value "$DOCKER_USERNAME" >/dev/null
+  sbx --cloud secret set-custom --name dhi-mcp-pat --host dhi.io \
+    --header X-Docker-Pat --format '%s' --value "$DOCKER_PAT" >/dev/null
+  note "Mirror tools enabled. Remove later: sbx --cloud secret rm -f dhi-mcp-user dhi-mcp-pat"
+elif [ -n "${DOCKER_USERNAME:-}${DOCKER_PAT:-}" ]; then
+  warn "Set BOTH DOCKER_USERNAME and DOCKER_PAT for DHI mirror tools; continuing with read-only tools."
+else
+  note "DHI read-only tools only. Export DOCKER_USERNAME + DOCKER_PAT for mirror tools."
+fi
 
 log "Creating '$NAME': codex, micro (1 vCPU / 2 GiB), ttl $TTL (stop on timeout)"
 note "egress: Balanced + dhi.io"
