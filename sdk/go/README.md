@@ -2,12 +2,12 @@
 
 The rest of this repo drives sandboxes with the `sbx` CLI. These demos drive the
 same cloud sandboxes **programmatically** with the official Go SDK
-([`docker/sandboxes-api`](https://github.com/docker/sandboxes-api)) — create,
+([`docker/sandboxes-api`](https://github.com/docker/sandboxes-api)) - create,
 run a process, collect output, delete, all in code.
 
 ![parallel: 5 cloud sandboxes at once](assets/parallel.gif)
 
-*`go run ./parallel` — five languages, five cloud microVMs, in parallel (recording of a real run).*
+*`go run ./parallel` - five languages, five cloud microVMs, in parallel (recording of a real run).*
 
 ## Why Go (and REST) here
 
@@ -20,9 +20,9 @@ language-agnostic **REST** API at `https://connect.docker.com/sandboxes`.
 - Go 1.25+ (`go version`).
 - A Docker account with Cloud Sandboxes access.
 - Auth, one of:
-  - `DOCKER_USERNAME` + `DOCKER_PAT` — unattended PAT auth (the SDK exchanges the
+  - `DOCKER_USERNAME` + `DOCKER_PAT` - unattended PAT auth (the SDK exchanges the
     PAT for a short-lived token; the PAT is never sent to the sandbox APIs).
-  - `DOCKER_ACCESS_TOKEN` — a ready access-token JWT.
+  - `DOCKER_ACCESS_TOKEN` - a ready access-token JWT.
 
 ```bash
 export DOCKER_USERNAME=your-dockerhub-user
@@ -83,7 +83,7 @@ client.WithSandbox(ctx, sandboxes.CreateInput{ImageRef: &img, Resources: &sandbo
 ```
 
 `WithSandbox` creates the sandbox, waits until it is running, runs your callback,
-then deletes it — even if the callback fails.
+then deletes it - even if the callback fails.
 
 ## Notes
 

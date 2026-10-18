@@ -103,7 +103,7 @@ Without those vars you still get all the read-only tools. Notes:
   adds the headers on the wire.
 
 **Open a new Codex session to see them.** `codex mcp add` writes
-`~/.codex/config.toml`, which Codex reads at session start — so the session that
+`~/.codex/config.toml`, which Codex reads at session start - so the session that
 was already running when you launched won't show the tools. Attach and start a
 fresh Codex session (the `+` tab in the web UI), then run `/mcp`.
 
@@ -135,7 +135,7 @@ known CVEs) instead of a third-party hardened image.
 
 > Note: the `dhi` tools **discover and inspect** images (catalog, tags, SBOM,
 > CVEs, attestations). Actually `docker pull dhi.io/<img>` needs DHI entitlement
-> and a `docker login` for your org — that is separate from these MCP tools and
+> and a `docker login` for your org - that is separate from these MCP tools and
 > from the `X-Docker-*` header secrets above.
 
 ## Notes
