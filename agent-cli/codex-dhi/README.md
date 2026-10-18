@@ -6,13 +6,16 @@ Reproduces the Docker Agentic Platform "Welcome" card as a single script:
 > **Balanced** and **dhi-only-registries** access (**dhi.io**), on **micro**
 > compute, and **stops after 1 hour**. Added **GitHub token** for repo access.
 
+Plus it wires the **DHI MCP server** into Codex so you get the Docker Hardened
+Images tools (`dhi_list_repositories`, `dhi_get_image_cves`, ...).
+
 ```bash
 export OPENAI_API_KEY=sk-...      # only needed if you have no 'openai' secret yet
 export GITHUB_TOKEN=ghp_...       # only needed if you have no 'github' secret yet
-./launch.sh                       # build it, print how to attach
+./launch.sh                       # build it, wire DHI MCP, print how to attach
 ./launch.sh -A                    # build it, then attach
 ./launch.sh -t 2h                 # longer TTL
-./launch.sh -M <catalog-name>     # also attach a hosted-catalog MCP server
+./launch.sh -M ""                 # skip the DHI MCP wiring
 ./launch.sh -G                    # skip the GitHub token
 ./teardown.sh
 ```
@@ -28,12 +31,12 @@ export GITHUB_TOKEN=ghp_...       # only needed if you have no 'github' secret y
 | stops after 1 hour | `--ttl 1h --on-timeout stop` |
 | Balanced access | `sbx --cloud policy init balanced --sandbox NAME` |
 | dhi.io / dhi-only-registries | `--allow-network dhi.io` |
-| DHI MCP server | see "The DHI MCP server" below (not `--static-mcp`) |
+| DHI MCP server | `codex mcp add dhi --url https://dhi.io/mcp` (inside the sandbox) |
 
-## The one-liner it runs
+## The commands it runs
 
-Secrets apply at **create time**, so they are set first; then one create call,
-then the policy:
+Secrets apply at **create time**, so they are set first; then create, policy,
+then the DHI MCP wiring:
 
 ```bash
 printf '%s' "$OPENAI_API_KEY" | sbx --cloud secret set openai
@@ -46,29 +49,40 @@ sbx --cloud run -d --name codex-dhi-demo \
   codex
 
 sbx --cloud policy init balanced --sandbox codex-dhi-demo
+sbx --cloud exec codex-dhi-demo codex mcp add dhi --url https://dhi.io/mcp
 ```
 
 ## The DHI MCP server
 
-There are **two different "dhi.io" things** on the platform, and only one is a
-`--static-mcp`:
+`https://dhi.io/mcp` is the Docker Hardened Images MCP server. Its search /
+inspect / SBOM / CVE / attestation tools are **read-only and need no auth**, so
+the script adds it straight into Codex's own MCP config with `codex mcp add`.
+Verified tools:
 
-1. **dhi.io registry/egress access** (what the card shows): the sandbox may pull
-   from `dhi.io`. The script does this with `--allow-network dhi.io` under the
-   Balanced policy. This is the part the "Welcome" card actually configures.
-2. **The dhi.io MCP server** on the Agentic Platform **MCP** page: that is an
-   *account-gateway* server (listed under "Your servers", reached through your
-   MCP gateway endpoint URL `https://gateway.docker.com/mcp/gateways/.../mcp`).
-   It is **not** a `--static-mcp` name. `--static-mcp` resolves against a
-   separate Docker-**hosted catalog**; `--static-mcp dhi.io` and `--static-mcp
-   dhi` both return *"not in the catalog"*.
+```
+dhi_list_repositories   dhi_get_repository        dhi_get_tag_definition
+dhi_get_image_details   dhi_get_image_packages    dhi_get_image_cves
+dhi_get_image_attestations   dhi_list_mirrors   dhi_create_mirror   dhi_remove_mirror
+```
 
-So MCP is **off by default** here (`-M` empty). To attach an MCP server:
+(The mirror-management tools need Docker Hub credentials via `X-Docker-Username`
+/ `X-Docker-Pat` headers; the rest work unauthenticated.)
 
-- For a **hosted-catalog** server, pass its catalog name: `./launch.sh -M <name>`.
-- For your **account-gateway** DHI server, point your agent at the gateway
-  endpoint URL from the MCP page ("Add to your client"), rather than
-  `--static-mcp`.
+**Open a new Codex session to see them.** `codex mcp add` writes
+`~/.codex/config.toml`, which Codex reads at session start — so the session that
+was already running when you launched won't show the tools. Attach and start a
+fresh Codex session (the `+` tab in the web UI), then run `/mcp`.
+
+### Why not the gateway URL or `--static-mcp`?
+
+- The platform's **MCP gateway URL** (`https://gateway.docker.com/mcp/gateways/.../mcp`)
+  requires an **OAuth bearer token** (a plain request returns `401` with
+  `WWW-Authenticate: Bearer`), so it is not a drop-in `--url`. The direct
+  `https://dhi.io/mcp` endpoint needs no auth and is simpler.
+- `--static-mcp` resolves a Docker-**hosted catalog**; `dhi.io` / `dhi` are not
+  in it (`not in the catalog`), and a sandbox created without `--static-mcp` has
+  no gateway to `sbx --cloud mcp load` into. Wiring Codex directly sidesteps all
+  of that.
 
 ## Notes
 

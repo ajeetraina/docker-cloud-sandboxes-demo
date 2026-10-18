@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 #
 # One-shot "Docker Agentic Platform" launch, as a script:
-#   Codex, with your OpenAI key, GitHub token for repo access, Balanced egress
-#   plus dhi.io registry access, on micro compute, stopping after 1h.
-#   (Attach a hosted-catalog MCP server with -M; see README for the DHI MCP note.)
+#   Codex, with your OpenAI key, GitHub token for repo access, the DHI MCP
+#   server wired into Codex, Balanced egress plus dhi.io registry access, on
+#   micro compute, stopping after 1h.
 #
-#   ./launch.sh [-n NAME] [-t TTL] [-M MCP] [-G] [-e KEY[=VALUE]]... [-A]
+#   ./launch.sh [-n NAME] [-t TTL] [-M URL] [-G] [-e KEY[=VALUE]]... [-A]
 #
 #   -n NAME  sandbox name (default: codex-dhi-demo)
 #   -t TTL   time to live (default: 1h; on timeout the sandbox stops)
-#   -M MCP   hosted-catalog MCP server name to attach (optional; see README)
+#   -M URL   DHI MCP endpoint to add to Codex (default: https://dhi.io/mcp; -M "" skips)
 #   -G       skip the GitHub token wiring (default: include it)
 #   -e VAR   env var, KEY=VALUE or bare KEY (copied from your shell); repeatable
 #   -A       attach to the agent session when it is ready
 #
 # Secrets (openai, github) must exist BEFORE create; this script sets them from
 # $OPENAI_API_KEY / $GITHUB_TOKEN if they are missing and the var is exported.
-# Env overrides: SBX_DEMO_NAME, SBX_DEMO_TTL, SBX_DEMO_MCP
+# Env overrides: SBX_DEMO_NAME, SBX_DEMO_TTL, SBX_DEMO_DHI_MCP
 
 set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); . "$HERE/../../lib/common.sh"
 
 NAME="${SBX_DEMO_NAME:-codex-dhi-demo}"
 TTL="${SBX_DEMO_TTL:-1h}"
-MCP="${SBX_DEMO_MCP:-}"   # empty = no --static-mcp; see README for the catalog caveat
+MCP="${SBX_DEMO_DHI_MCP:-https://dhi.io/mcp}"   # DHI MCP endpoint added to Codex; "" to skip
 WANT_GITHUB=1; ENVS=(); ATTACH=0
 
 while getopts "n:t:M:Ge:Ah" opt; do
@@ -54,7 +54,6 @@ ensure_secret() {
 
 EXTRA=()
 for e in ${ENVS[@]+"${ENVS[@]}"}; do validate_env "$e"; EXTRA+=(--env "$e"); done
-[ -n "$MCP" ] && EXTRA+=(--static-mcp "$MCP")
 
 cloud_preflight "$NAME"
 
@@ -63,7 +62,7 @@ ensure_secret openai OPENAI_API_KEY
 [ "$WANT_GITHUB" -eq 1 ] && ensure_secret github GITHUB_TOKEN
 
 log "Creating '$NAME': codex, micro (1 vCPU / 2 GiB), ttl $TTL (stop on timeout)"
-note "MCP: ${MCP:-none}   egress: Balanced + dhi.io"
+note "egress: Balanced + dhi.io"
 sbx --cloud run -d \
   --name "$NAME" \
   --cpus 1 --memory 2g \
@@ -77,22 +76,35 @@ log "Applying the Balanced network policy to '$NAME' (keeps the dhi.io allow)"
 sbx --cloud policy init balanced --sandbox "$NAME" \
   || warn "Could not set the balanced policy; the sandbox keeps the default."
 
+if [ -n "$MCP" ]; then
+  log "Wiring the DHI MCP server into Codex ($MCP)"
+  # dhi.io/mcp serves read-only DHI tools with no auth; it is registered in
+  # Codex's config, so a NEW Codex session picks it up (not the first one).
+  if sbx --cloud exec "$NAME" codex mcp add dhi --url "$MCP" >/dev/null 2>&1; then
+    note "Added 'dhi' to Codex. Open a NEW Codex session, then /mcp to see its tools."
+  else
+    warn "Could not add the DHI MCP server. Add it by hand:"
+    note "sbx --cloud exec $NAME codex mcp add dhi --url $MCP"
+  fi
+fi
+
 echo
 log "Ready."
 cat <<MSG
 
 This reproduces the Agentic Platform card:
-  codex  |  OpenAI key (proxy-injected)  |  GitHub token  |  MCP: ${MCP:-none}
+  codex  |  OpenAI key (proxy-injected)  |  GitHub token  |  DHI MCP: ${MCP:-none}
   micro compute  |  Balanced + dhi.io egress  |  stops after $TTL
 
-Attach and start:
+Attach and start (open a NEW Codex session so it loads the DHI tools):
 
   sbx --cloud attach $NAME
+  # in Codex:  /mcp   ->   dhi_list_repositories, dhi_get_image_cves, ...
 
 Inspect what was applied:
 
   sbx --cloud policy ls $NAME     # network rules on this sandbox
-  sbx --cloud ttl $NAME           # remaining time
+  sbx --cloud exec $NAME codex mcp list    # DHI MCP registration
   ./teardown.sh                   # delete when done
 MSG
 
