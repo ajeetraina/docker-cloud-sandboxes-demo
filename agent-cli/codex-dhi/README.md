@@ -11,7 +11,8 @@ export OPENAI_API_KEY=sk-...      # only needed if you have no 'openai' secret y
 export GITHUB_TOKEN=ghp_...       # only needed if you have no 'github' secret yet
 ./launch.sh                       # build it, print how to attach
 ./launch.sh -A                    # build it, then attach
-./launch.sh -t 2h -M dhi          # longer TTL, explicit MCP name
+./launch.sh -t 2h                 # longer TTL
+./launch.sh -M <catalog-name>     # also attach a hosted-catalog MCP server
 ./launch.sh -G                    # skip the GitHub token
 ./teardown.sh
 ```
@@ -27,7 +28,7 @@ export GITHUB_TOKEN=ghp_...       # only needed if you have no 'github' secret y
 | stops after 1 hour | `--ttl 1h --on-timeout stop` |
 | Balanced access | `sbx --cloud policy init balanced --sandbox NAME` |
 | dhi.io / dhi-only-registries | `--allow-network dhi.io` |
-| DHI MCP server | `--static-mcp dhi` |
+| DHI MCP server | see "The DHI MCP server" below (not `--static-mcp`) |
 
 ## The one-liner it runs
 
@@ -42,18 +43,32 @@ sbx --cloud run -d --name codex-dhi-demo \
   --cpus 1 --memory 2g \
   --ttl 1h --on-timeout stop \
   --allow-network dhi.io \
-  --static-mcp dhi \
   codex
 
 sbx --cloud policy init balanced --sandbox codex-dhi-demo
 ```
 
-## The DHI MCP server name
+## The DHI MCP server
 
-`--static-mcp` resolves names on the **cloud MCP gateway**. The default here is
-`dhi`; if create errors on an unknown MCP server, find the exact name on the
-Agentic Platform's **MCP** page (or `sbx --cloud mcp ls` once one is
-provisioned) and pass it with `-M <name>`. Set `-M ""` to launch without it.
+There are **two different "dhi.io" things** on the platform, and only one is a
+`--static-mcp`:
+
+1. **dhi.io registry/egress access** (what the card shows): the sandbox may pull
+   from `dhi.io`. The script does this with `--allow-network dhi.io` under the
+   Balanced policy. This is the part the "Welcome" card actually configures.
+2. **The dhi.io MCP server** on the Agentic Platform **MCP** page: that is an
+   *account-gateway* server (listed under "Your servers", reached through your
+   MCP gateway endpoint URL `https://gateway.docker.com/mcp/gateways/.../mcp`).
+   It is **not** a `--static-mcp` name. `--static-mcp` resolves against a
+   separate Docker-**hosted catalog**; `--static-mcp dhi.io` and `--static-mcp
+   dhi` both return *"not in the catalog"*.
+
+So MCP is **off by default** here (`-M` empty). To attach an MCP server:
+
+- For a **hosted-catalog** server, pass its catalog name: `./launch.sh -M <name>`.
+- For your **account-gateway** DHI server, point your agent at the gateway
+  endpoint URL from the MCP page ("Add to your client"), rather than
+  `--static-mcp`.
 
 ## Notes
 

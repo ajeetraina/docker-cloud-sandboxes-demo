@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 #
 # One-shot "Docker Agentic Platform" launch, as a script:
-#   Codex, with your OpenAI key, GitHub token for repo access, the DHI MCP
-#   server, Balanced egress plus dhi.io, on micro compute, stopping after 1h.
+#   Codex, with your OpenAI key, GitHub token for repo access, Balanced egress
+#   plus dhi.io registry access, on micro compute, stopping after 1h.
+#   (Attach a hosted-catalog MCP server with -M; see README for the DHI MCP note.)
 #
 #   ./launch.sh [-n NAME] [-t TTL] [-M MCP] [-G] [-e KEY[=VALUE]]... [-A]
 #
 #   -n NAME  sandbox name (default: codex-dhi-demo)
 #   -t TTL   time to live (default: 1h; on timeout the sandbox stops)
-#   -M MCP   DHI MCP server name on the cloud gateway (default: dhi; see README)
+#   -M MCP   hosted-catalog MCP server name to attach (optional; see README)
 #   -G       skip the GitHub token wiring (default: include it)
 #   -e VAR   env var, KEY=VALUE or bare KEY (copied from your shell); repeatable
 #   -A       attach to the agent session when it is ready
@@ -22,14 +23,14 @@ HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); . "$HERE/../../lib/common.sh
 
 NAME="${SBX_DEMO_NAME:-codex-dhi-demo}"
 TTL="${SBX_DEMO_TTL:-1h}"
-MCP="${SBX_DEMO_MCP:-dhi}"
+MCP="${SBX_DEMO_MCP:-}"   # empty = no --static-mcp; see README for the catalog caveat
 WANT_GITHUB=1; ENVS=(); ATTACH=0
 
 while getopts "n:t:M:Ge:Ah" opt; do
   case $opt in
     n) NAME=$OPTARG ;; t) TTL=$OPTARG ;; M) MCP=$OPTARG ;;
     G) WANT_GITHUB=0 ;; e) ENVS+=("$OPTARG") ;; A) ATTACH=1 ;;
-    h) sed -n '3,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;; *) exit 2 ;;
+    h) sed -n '3,19p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;; *) exit 2 ;;
   esac
 done
 
@@ -81,7 +82,7 @@ log "Ready."
 cat <<MSG
 
 This reproduces the Agentic Platform card:
-  codex  |  OpenAI key (proxy-injected)  |  GitHub token  |  DHI MCP ($MCP)
+  codex  |  OpenAI key (proxy-injected)  |  GitHub token  |  MCP: ${MCP:-none}
   micro compute  |  Balanced + dhi.io egress  |  stops after $TTL
 
 Attach and start:
