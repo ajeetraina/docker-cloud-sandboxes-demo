@@ -5,14 +5,15 @@ same cloud sandboxes **programmatically** with the official Go SDK
 ([`docker/sandboxes-api`](https://github.com/docker/sandboxes-api)) — create,
 run a process, collect output, delete, all in code.
 
+![parallel: 5 cloud sandboxes at once](assets/parallel.gif)
+
+*`go run ./parallel` — five languages, five cloud microVMs, in parallel (recording of a real run).*
+
 ## Why Go (and REST) here
 
-The SDK suite has TypeScript, Python, and Go. As of this writing the
-**npm (`@docker/sandboxes-api`) and PyPI (`docker-sandboxes-api`) packages are
-not published yet** (both 404), so the works-today paths are:
-
-- **Go** — `go get` straight from GitHub (used here).
-- **REST** — plain HTTP against `https://connect.docker.com/sandboxes` (any language).
+The SDK suite has TypeScript, Python, and Go. These demos use the **Go** SDK
+(`go get` straight from GitHub). The same sandboxes are also reachable over the
+language-agnostic **REST** API at `https://connect.docker.com/sandboxes`.
 
 ## Requirements
 
@@ -57,6 +58,20 @@ alpine   5.951s    Alpine 3.20.10
 
 (Wall time tracks the slowest single sandbox, so the speedup grows with more
 jobs. Larger base images like `golang` spend most of that time pulling.)
+
+## Record your own GIF
+
+The GIF above is made with [VHS](https://github.com/charmbracelet/vhs). Record a
+fresh one from a **live** run (needs your Docker auth):
+
+```bash
+cd sdk/go
+export DOCKER_USERNAME=... DOCKER_PAT=...
+vhs parallel.tape            # runs `go run ./parallel`, writes parallel.gif
+```
+
+`parallel.tape` captures the real run; `assets/demo.tape` replays the saved
+output (no auth) and produced the committed `assets/parallel.gif`.
 
 ## The SDK in three lines
 

@@ -85,8 +85,8 @@ go run ./hello       # one sandbox: create -> run -> delete
 go run ./parallel    # N sandboxes at once, with a parallel-vs-sequential speedup
 ```
 
-The TypeScript/Python packages are not on npm/PyPI yet, so Go (`go get`) and the
-REST API are the works-today paths. See [`sdk/go/README.md`](sdk/go/README.md).
+The SDK ships for TypeScript, Python, and Go; these examples use Go (`go get`),
+and the REST API works for any language. See [`sdk/go/README.md`](sdk/go/README.md).
 
 ## Cleaning up
 
