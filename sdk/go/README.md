@@ -36,6 +36,9 @@ go run ./hello       # one sandbox: create -> run python -> auto-delete
 go run ./parallel    # N sandboxes at once: fan out, collect a table, show speedup
 ```
 
+> Verified live: `go run ./hello` with PAT auth created a sandbox, printed
+> `Hello from a Docker Cloud Sandbox via the Go SDK`, and auto-deleted it.
+
 Example `parallel` output:
 
 ```

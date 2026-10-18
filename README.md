@@ -103,4 +103,5 @@ down when finished so nothing lingers.
 
 - [x] `agent-cli/codex` created, cloned a repo into it, verified running, torn down (live-tested).
 - [x] `agent-cli/codex-dhi` DHI MCP wired and used live (Codex recommended `dhi.io/nginx:...-fips` via the `dhi` tools).
+- [x] `sdk/go` Go SDK verified live: `hello` created a sandbox, ran Python, and auto-deleted it via PAT auth.
 - [ ] `agent-cli/claude`, `agent-cli/opencode`, `agent-cli/gemini` use the same path, not separately live-tested.
