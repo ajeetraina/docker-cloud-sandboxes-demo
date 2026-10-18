@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Demo } from "@/data/demos";
 import { Arrow, Check } from "./icons";
 
@@ -9,10 +10,8 @@ const diffColor: Record<Demo["difficulty"], string> = {
 
 export function DemoCard({ demo }: { demo: Demo }) {
   return (
-    <a
-      href={demo.github}
-      target="_blank"
-      rel="noreferrer"
+    <Link
+      href={`/demos/${demo.slug}/`}
       className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-docker-blue/40 hover:shadow-soft"
     >
       <div className="flex items-start justify-between gap-3">
@@ -54,6 +53,6 @@ export function DemoCard({ demo }: { demo: Demo }) {
           Open <Arrow width={14} height={14} />
         </span>
       </div>
-    </a>
+    </Link>
   );
 }

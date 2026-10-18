@@ -32,7 +32,13 @@ export interface Demo {
   quickstart: Step[];
   expected?: string;
   cleanup: string;
+  whatYouBuild: string;
+  whyItMatters: string;
+  securityNote: string;
 }
+
+const proxyNote =
+  "The agent runs inside an isolated microVM. Its provider credential is a proxy-managed placeholder in the sandbox; the real value is injected by the cloud proxy on outbound requests to the provider and never touches the container's filesystem or environment.";
 
 export const demos: Demo[] = [
   {
@@ -43,7 +49,10 @@ export const demos: Demo[] = [
     tech: ["Codex", "sbx CLI"],
     difficulty: "Beginner",
     minutes: 5,
-    prerequisites: ["sbx installed and signed in (`sbx login`)", "An `openai` secret stored: `echo $OPENAI_API_KEY | sbx --cloud secret set openai`"],
+    prerequisites: [
+      "sbx installed and signed in (`sbx login`)",
+      "An `openai` secret stored: `echo $OPENAI_API_KEY | sbx --cloud secret set openai`",
+    ],
     path: "agent-cli/codex",
     github: tree("agent-cli/codex"),
     status: "verified",
@@ -56,6 +65,9 @@ export const demos: Demo[] = [
     ],
     expected: "==> Ready.\n\nAttach to the agent session:\n\n  sbx --cloud attach codex-demo",
     cleanup: "./teardown.sh",
+    whatYouBuild: "A cloud sandbox running OpenAI Codex that you attach to and drive from a terminal.",
+    whyItMatters: "Coding agents execute arbitrary code. A disposable microVM keeps that off your laptop, under a TTL and a network policy.",
+    securityNote: proxyNote,
   },
   {
     slug: "claude",
@@ -76,6 +88,9 @@ export const demos: Demo[] = [
       { cmd: "./teardown.sh" },
     ],
     cleanup: "./teardown.sh",
+    whatYouBuild: "A cloud sandbox running Claude Code, attached to a live terminal session.",
+    whyItMatters: "The same isolation and lifecycle benefits as any agent demo, for teams standardizing on Claude Code.",
+    securityNote: proxyNote,
   },
   {
     slug: "gemini",
@@ -96,6 +111,9 @@ export const demos: Demo[] = [
       { cmd: "./teardown.sh" },
     ],
     cleanup: "./teardown.sh",
+    whatYouBuild: "A cloud sandbox running the Gemini CLI, attached to a live terminal.",
+    whyItMatters: "Try Google's agent with the same disposable, policy-bounded workflow as the others.",
+    securityNote: proxyNote,
   },
   {
     slug: "opencode",
@@ -116,6 +134,9 @@ export const demos: Demo[] = [
       { cmd: "./teardown.sh" },
     ],
     cleanup: "./teardown.sh",
+    whatYouBuild: "A cloud sandbox running OpenCode, the open-source terminal coding agent.",
+    whyItMatters: "An open-source agent in the same isolated, multi-provider workflow.",
+    securityNote: proxyNote,
   },
   {
     slug: "codex-dhi",
@@ -132,12 +153,15 @@ export const demos: Demo[] = [
     reach: "sbx --cloud attach codex-dhi-demo, then /mcp in Codex",
     quickstart: [
       { cmd: "cd agent-cli/codex-dhi" },
-      { cmd: "./launch.sh", explain: "Micro Codex sandbox with Balanced egress + dhi.io, DHI MCP wired, and an AGENTS.md that steers Codex to DHI." },
+      { cmd: "./launch.sh", explain: "Micro Codex sandbox with Balanced egress + dhi.io, the DHI MCP server wired in, and an AGENTS.md that steers Codex to DHI." },
       { cmd: "sbx --cloud attach codex-dhi-demo", explain: "Open a new Codex session, then /mcp to see the DHI tools." },
       { cmd: "./teardown.sh" },
     ],
     expected: "/mcp -> dhi_list_repositories, dhi_get_image_cves, dhi_get_image_packages, ...\nAsk for a hardened nginx -> dhi.io/nginx:1.30.6-debian13-fips",
     cleanup: "./teardown.sh",
+    whatYouBuild: "A Codex sandbox wired to the Docker Hardened Images MCP server, with Balanced egress plus dhi.io, steered to recommend hardened base images.",
+    whyItMatters: "Governance in practice: network egress control, proxy-injected secrets, and pushing an agent toward hardened, low-CVE images instead of whatever its training suggests.",
+    securityNote: "Balanced egress is deny-all plus an allowlist. For DHI mirror tools, Docker Hub credentials are injected as X-Docker-* headers by the proxy, so the PAT never enters the sandbox. The OpenAI credential is proxy-managed the same way.",
   },
   {
     slug: "sdk-hello",
@@ -159,6 +183,9 @@ export const demos: Demo[] = [
     ],
     expected: "sandbox: sandboxes/sbx_001m57m9...\nHello from a Docker Cloud Sandbox via the Go SDK",
     cleanup: "WithSandbox deletes the sandbox automatically.",
+    whatYouBuild: "A Go program that creates a sandbox, runs Python inside it, and deletes it.",
+    whyItMatters: "Programmatic control means sandboxes can live in scripts, tests, and CI, not just an interactive terminal.",
+    securityNote: "PAT auth is exchanged by the SDK for a short-lived access token; the PAT is never sent to the sandbox APIs or written to disk by the example.",
   },
   {
     slug: "sdk-parallel",
@@ -180,6 +207,9 @@ export const demos: Demo[] = [
     ],
     expected: "5/5 ok | wall 19.989s vs sequential 1m0.771s | 3.0x faster in parallel",
     cleanup: "Each sandbox is deleted as its command finishes.",
+    whatYouBuild: "A Go program that launches five sandboxes concurrently with goroutines and collects their output into a table.",
+    whyItMatters: "Fan-out across environments or base images is trivial in code and awkward from the CLI - the SDK's superpower.",
+    securityNote: "Same PAT exchange as the Hello demo. Each sandbox is isolated from the others and cleaned up as its command finishes.",
   },
 ];
 
@@ -195,3 +225,7 @@ export const stats = {
   agents: 4,
   languages: 5,
 };
+
+export function getDemo(slug: string) {
+  return demos.find((d) => d.slug === slug);
+}
