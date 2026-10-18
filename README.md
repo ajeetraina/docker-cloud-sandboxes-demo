@@ -1,4 +1,4 @@
-# Docker Cloud Sandboxes — v3 kit demos
+# Docker Cloud Sandboxes Demos
 
 A collection of small, copy-and-run demos that each launch a **Docker cloud
 sandbox** for a different **Kits v3** kit, using the `sbx --cloud` CLI. One
