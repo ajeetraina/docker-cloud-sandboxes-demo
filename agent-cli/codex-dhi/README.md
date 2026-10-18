@@ -118,6 +118,26 @@ fresh Codex session (the `+` tab in the web UI), then run `/mcp`.
   no gateway to `sbx --cloud mcp load` into. Wiring Codex directly sidesteps all
   of that.
 
+## Make Codex prefer DHI
+
+Having the tools wired is not enough. Asked for a generic "hardened nginx",
+Codex tends to reach for Chainguard or Docker Hub (what its training associates
+with "hardened"), not DHI. So the script also writes a `~/workspace/AGENTS.md`
+telling Codex to use the `dhi` tools and prefer `dhi.io` for hardened images.
+
+With that in place, a plain prompt works:
+
+> "I need a hardened nginx base image for production. Which image and tag?"
+
+Codex calls `dhi_list_repositories` / `dhi_get_repository` and recommends a real
+DHI image, e.g. `dhi.io/nginx:1.30.6-debian13-fips` (version-pinned, FIPS, zero
+known CVEs) instead of a Chainguard image.
+
+> Note: the `dhi` tools **discover and inspect** images (catalog, tags, SBOM,
+> CVEs, attestations). Actually `docker pull dhi.io/<img>` needs DHI entitlement
+> and a `docker login` for your org — that is separate from these MCP tools and
+> from the `X-Docker-*` header secrets above.
+
 ## Notes
 
 - `Balanced` = deny-all plus the balanced allow list; the `--sandbox` form keeps

@@ -104,6 +104,16 @@ if [ -n "$MCP" ]; then
     warn "Could not add the DHI MCP server. Add it by hand:"
     note "sbx --cloud exec $NAME codex mcp add dhi --url $MCP"
   fi
+
+  # Steer Codex to actually USE the DHI tools. Without this, a request like
+  # "pull a hardened nginx" resolves to Chainguard/Docker Hub from training, not
+  # DHI. The steering text lives in AGENTS.md beside this script; deploy it to
+  # the Codex workspace (~/workspace/AGENTS.md), which Codex reads at session start.
+  if [ -f "$HERE/AGENTS.md" ]; then
+    sbx --cloud exec "$NAME" sh -lc 'mkdir -p ~/workspace && cat > ~/workspace/AGENTS.md' < "$HERE/AGENTS.md" \
+      && note "Deployed AGENTS.md to ~/workspace so Codex prefers DHI for hardened images." \
+      || warn "Could not write the AGENTS.md steering file."
+  fi
 fi
 
 echo
