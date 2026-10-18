@@ -11,33 +11,33 @@ through hands-on demos, CLI workflows, and SDK examples.
 
 </div>
 
-<table>
+<table width="100%">
   <tr>
-    <td align="center" width="25%">
-      <a href="agent-cli/claude"><img src="docs/icons/claude.png" width="44" height="44" alt=""><br/><sub><b>Claude Code</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="agent-cli/claude"><img src="docs/icons/claude.png" width="52" height="52" alt=""><br/><br/><b>Claude Code</b></a>
     </td>
-    <td align="center" width="25%">
-      <a href="agent-cli/codex"><img src="docs/icons/codex.png" width="44" height="44" alt=""><br/><sub><b>OpenAI Codex</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="agent-cli/codex"><img src="docs/icons/codex.png" width="52" height="52" alt=""><br/><br/><b>OpenAI Codex</b></a>
     </td>
-    <td align="center" width="25%">
-      <a href="agent-cli/gemini"><img src="docs/icons/gemini.png" width="44" height="44" alt=""><br/><sub><b>Gemini CLI</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="agent-cli/gemini"><img src="docs/icons/gemini.png" width="52" height="52" alt=""><br/><br/><b>Gemini CLI</b></a>
     </td>
-    <td align="center" width="25%">
-      <a href="agent-cli/opencode"><img src="docs/icons/opencode.png" width="44" height="44" alt=""><br/><sub><b>OpenCode</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="agent-cli/opencode"><img src="docs/icons/opencode.png" width="52" height="52" alt=""><br/><br/><b>OpenCode</b></a>
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <a href="agent-cli/codex-dhi"><img src="docs/icons/dhi.png" width="44" height="44" alt=""><br/><sub><b>Codex + Docker DHI</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="agent-cli/codex-dhi"><img src="docs/icons/dhi.png" width="52" height="52" alt=""><br/><br/><b>Codex + Docker DHI</b></a>
     </td>
-    <td align="center">
-      <a href="sdk/go/hello"><img src="docs/icons/sdk-hello.png" width="44" height="44" alt=""><br/><sub><b>Go SDK · Hello</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="sdk/go/hello"><img src="docs/icons/sdk-hello.png" width="52" height="52" alt=""><br/><br/><b>Go SDK · Hello</b></a>
     </td>
-    <td align="center">
-      <a href="sdk/go/parallel"><img src="docs/icons/sdk-parallel.png" width="44" height="44" alt=""><br/><sub><b>Go SDK · Parallel</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="sdk/go/parallel"><img src="docs/icons/sdk-parallel.png" width="52" height="52" alt=""><br/><br/><b>Go SDK · Parallel</b></a>
     </td>
-    <td align="center">
-      <a href="web"><img src="docs/icons/portal.png" width="44" height="44" alt=""><br/><sub><b>Web Portal</b></sub></a>
+    <td align="center" width="25%" height="120">
+      <a href="web"><img src="docs/icons/portal.png" width="52" height="52" alt=""><br/><br/><b>Web Portal</b></a>
     </td>
   </tr>
 </table>

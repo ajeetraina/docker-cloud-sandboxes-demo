@@ -7,7 +7,11 @@
 export const REPO = "https://github.com/ajeetraina/docker-cloud-sandboxes-demo";
 const tree = (p: string) => `${REPO}/tree/main/${p}`;
 
-export type Category = "AI Coding Agents" | "Security & Governance" | "Programmatic Automation";
+export type Category =
+  | "AI Coding Agents"
+  | "Language Runtimes"
+  | "Security & Governance"
+  | "Programmatic Automation";
 export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 export type Status = "verified" | "unverified";
 
@@ -213,8 +217,51 @@ export const demos: Demo[] = [
   },
 ];
 
+const langSecurity =
+  "The sandbox is an isolated microVM, so nothing it runs can touch your host. PAT auth is exchanged by the SDK for a short-lived token and is never sent to the sandbox.";
+
+type Lang = { slug: string; name: string; image: string; run: string; out: string; verified: boolean };
+
+const languages: Lang[] = [
+  { slug: "python-sandbox", name: "Python Sandbox", image: "python:3.12", run: `python -c "print('Hello from a Python cloud sandbox')"`, out: "Hello from a Python cloud sandbox", verified: true },
+  { slug: "nodejs-sandbox", name: "Node.js Sandbox", image: "node:22", run: `node -e "console.log('Hello from a Node.js cloud sandbox')"`, out: "Hello from a Node.js cloud sandbox", verified: true },
+  { slug: "go-sandbox", name: "Go Sandbox", image: "golang:1.25", run: "go version", out: "go version go1.25.x linux/amd64", verified: true },
+  { slug: "ruby-sandbox", name: "Ruby Sandbox", image: "ruby:3.3", run: `ruby -e "puts 'Hello from a Ruby cloud sandbox'"`, out: "Hello from a Ruby cloud sandbox", verified: true },
+  { slug: "rust-sandbox", name: "Rust Sandbox", image: "rust:1", run: "rustc --version", out: "rustc 1.x.0", verified: false },
+];
+
+function languageSandboxes(): Demo[] {
+  return languages.map((l) => ({
+    slug: l.slug,
+    name: l.name,
+    tagline: `Spin up an isolated cloud sandbox with the ${l.name.replace(" Sandbox", "")} runtime and run code in seconds.`,
+    category: "Language Runtimes" as Category,
+    tech: [l.name.replace(" Sandbox", ""), "Go SDK", l.image],
+    difficulty: "Beginner" as Difficulty,
+    minutes: 3,
+    prerequisites: ["Go 1.25+", "DOCKER_USERNAME + DOCKER_PAT (or DOCKER_ACCESS_TOKEN)"],
+    path: "sdk/go/run",
+    github: tree("sdk/go/run"),
+    status: (l.verified ? "verified" : "unverified") as Status,
+    reach: "program stdout",
+    quickstart: [
+      { cmd: "cd sdk/go" },
+      { cmd: "export DOCKER_USERNAME=... DOCKER_PAT=..." },
+      { cmd: `go run ./run ${l.image} ${l.run}`, explain: `Create a sandbox from ${l.image}, run the command, print output, and delete it.` },
+    ],
+    expected: `sandbox: sandboxes/sbx_...  (${l.image})\n${l.out}`,
+    cleanup: "The sandbox is deleted automatically when the command finishes.",
+    whatYouBuild: `A disposable cloud sandbox running the ${l.image} image, driven by the generic Go SDK runner.`,
+    whyItMatters: "A clean, isolated runtime for throwaway experiments, reproducible snippets, or per-language CI jobs - no local toolchain required.",
+    securityNote: langSecurity,
+  }));
+}
+
+demos.push(...languageSandboxes());
+
 export const categories: Category[] = [
   "AI Coding Agents",
+  "Language Runtimes",
   "Security & Governance",
   "Programmatic Automation",
 ];

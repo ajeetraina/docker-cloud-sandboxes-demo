@@ -35,6 +35,15 @@ export DOCKER_PAT=dckr_pat_...
 cd sdk/go
 go run ./hello       # one sandbox: create -> run python -> auto-delete
 go run ./parallel    # N sandboxes at once: fan out, collect a table, show speedup
+go run ./run IMAGE [cmd...]   # a sandbox from any image (the per-language runner)
+```
+
+`./run` is the generic engine behind the per-language sandboxes:
+
+```bash
+go run ./run python:3.12 python --version
+go run ./run node:22 node -e "console.log('hi')"
+go run ./run rust:1 rustc --version
 ```
 
 > Verified live: `go run ./hello` with PAT auth created a sandbox, printed
