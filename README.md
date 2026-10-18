@@ -1,8 +1,7 @@
 # Docker Cloud Sandboxes Demos
 
 A collection of small, copy-and-run demos that each launch a **Docker cloud
-sandbox** for a different **Kits v3** kit, using the `sbx --cloud` CLI. One
-folder per kit. Every folder has the same three files:
+sandbox** using the `sbx --cloud` CLI. 
 
 - `launch.sh` — create the sandbox, wire it up, print how to reach it
 - `teardown.sh` — delete it
