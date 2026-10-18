@@ -40,6 +40,9 @@ cd agent-cli/codex
 ./teardown.sh                # delete when done
 ```
 
+<img width="1807" height="456" alt="image" src="https://github.com/user-attachments/assets/bee94f0b-3951-46f5-baa8-698626a8e2d5" />
+
+
 ## Common options
 
 Every `launch.sh` accepts these (defaults differ per demo, see `-h`):
