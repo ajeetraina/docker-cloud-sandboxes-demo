@@ -1,4 +1,4 @@
-# Docker Cloud Sandboxes — Go SDK demos
+# Docker Cloud Sandboxes ~ Go SDK demos
 
 The rest of this repo drives sandboxes with the `sbx` CLI. These demos drive the
 same cloud sandboxes **programmatically** with the official Go SDK
