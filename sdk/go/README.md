@@ -39,21 +39,24 @@ go run ./parallel    # N sandboxes at once: fan out, collect a table, show speed
 > Verified live: `go run ./hello` with PAT auth created a sandbox, printed
 > `Hello from a Docker Cloud Sandbox via the Go SDK`, and auto-deleted it.
 
-Example `parallel` output:
+Real `parallel` run (5 live cloud sandboxes):
 
 ```
 Spinning up 5 sandboxes in parallel...
 
 KIT      TIME      OUTPUT
 ----------------------------------------------------
-python   7.2s      Python 3.12.7
-node     6.9s      Node v22.9.0
-go       8.1s      go version go1.25.1 linux/arm64
-ruby     7.4s      Ruby 3.3.5
-alpine   5.8s      Alpine 3.20.3
+python   7.33s     Python 3.12.15
+node     9.683s    Node v22.23.3
+go       19.989s   go version go1.25.14 linux/amd64
+ruby     17.818s   Ruby 3.3.12
+alpine   5.951s    Alpine 3.20.10
 
-5/5 ok | wall 8.3s vs sequential 35.4s | 4.3x faster in parallel
+5/5 ok | wall 19.989s vs sequential 1m0.771s | 3.0x faster in parallel
 ```
+
+(Wall time tracks the slowest single sandbox, so the speedup grows with more
+jobs. Larger base images like `golang` spend most of that time pulling.)
 
 ## The SDK in three lines
 
