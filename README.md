@@ -13,30 +13,30 @@ through hands-on demos, CLI workflows, and SDK examples.
 
 <table width="100%">
   <tr>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="agent-cli/claude"><img src="docs/icons/claude.png" width="52" height="52" alt=""><br/><br/><b>Claude Code</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="agent-cli/codex"><img src="docs/icons/codex.png" width="52" height="52" alt=""><br/><br/><b>OpenAI Codex</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="agent-cli/gemini"><img src="docs/icons/gemini.png" width="52" height="52" alt=""><br/><br/><b>Gemini CLI</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="agent-cli/opencode"><img src="docs/icons/opencode.png" width="52" height="52" alt=""><br/><br/><b>OpenCode</b></a>
     </td>
   </tr>
   <tr>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="agent-cli/codex-dhi"><img src="docs/icons/dhi.png" width="52" height="52" alt=""><br/><br/><b>Codex + Docker DHI</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="sdk/go/hello"><img src="docs/icons/sdk-hello.png" width="52" height="52" alt=""><br/><br/><b>Go SDK · Hello</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="sdk/go/parallel"><img src="docs/icons/sdk-parallel.png" width="52" height="52" alt=""><br/><br/><b>Go SDK · Parallel</b></a>
     </td>
-    <td align="center" width="25%" height="120">
+    <td align="center" width="220" height="128">
       <a href="web"><img src="docs/icons/portal.png" width="52" height="52" alt=""><br/><br/><b>Web Portal</b></a>
     </td>
   </tr>
