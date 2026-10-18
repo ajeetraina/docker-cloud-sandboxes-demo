@@ -1,68 +1,116 @@
+<div align="center">
+
 # Docker Cloud Sandboxes Demos
 
-A collection of small, copy-and-run demos that each launch a **Docker cloud
-sandbox** using the `sbx --cloud` CLI. One folder per demo, each with:
+### Your AI Agents. Their Own Cloud Sandboxes.
 
-- `launch.sh` to create the sandbox, wire it up, and print how to reach it
-- `teardown.sh` to delete it
-- `README.md` for what it does and how to drive it
+Explore, launch, and orchestrate AI coding agents in isolated **Docker Cloud Sandboxes**
+through hands-on demos, CLI workflows, and SDK examples.
 
-They share one small library, [`lib/common.sh`](lib/common.sh), for logging,
-preflight checks, the size table, and repo cloning, so each `launch.sh` stays
-short.
+**[Quick start](#-quick-start)**&nbsp;·&nbsp;**[Demos](#-the-demos)**&nbsp;·&nbsp;**[Architecture](#-how-it-works)**&nbsp;·&nbsp;**[Go SDK](#-drive-it-from-code-go-sdk)**&nbsp;·&nbsp;**[Web portal](web)**
 
+</div>
 
-## Requirements
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <a href="agent-cli/claude"><img src="docs/icons/claude.png" width="44" height="44" alt=""><br/><sub><b>Claude Code</b></sub></a>
+    </td>
+    <td align="center" width="25%">
+      <a href="agent-cli/codex"><img src="docs/icons/codex.png" width="44" height="44" alt=""><br/><sub><b>OpenAI Codex</b></sub></a>
+    </td>
+    <td align="center" width="25%">
+      <a href="agent-cli/gemini"><img src="docs/icons/gemini.png" width="44" height="44" alt=""><br/><sub><b>Gemini CLI</b></sub></a>
+    </td>
+    <td align="center" width="25%">
+      <a href="agent-cli/opencode"><img src="docs/icons/opencode.png" width="44" height="44" alt=""><br/><sub><b>OpenCode</b></sub></a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="agent-cli/codex-dhi"><img src="docs/icons/dhi.png" width="44" height="44" alt=""><br/><sub><b>Codex + Docker DHI</b></sub></a>
+    </td>
+    <td align="center">
+      <a href="sdk/go/hello"><img src="docs/icons/sdk-hello.png" width="44" height="44" alt=""><br/><sub><b>Go SDK · Hello</b></sub></a>
+    </td>
+    <td align="center">
+      <a href="sdk/go/parallel"><img src="docs/icons/sdk-parallel.png" width="44" height="44" alt=""><br/><sub><b>Go SDK · Parallel</b></sub></a>
+    </td>
+    <td align="center">
+      <a href="web"><img src="docs/icons/portal.png" width="44" height="44" alt=""><br/><sub><b>Web Portal</b></sub></a>
+    </td>
+  </tr>
+</table>
 
-- `sbx` installed and signed in (`sbx login`). Built against v0.48.0.
-- Access to Docker cloud sandboxes. `sbx --cloud ls` should not error.
+Each tile links to a runnable demo. The agents use the `sbx` CLI; the SDK tiles are
+programmatic Go. The **[Web Portal](web)** is a Next.js developer experience with an
+interactive catalog and architecture diagram.
 
-## The demos
+<div align="center">
+  <img src="sdk/go/assets/parallel.gif" width="760" alt="go run ./parallel: five cloud sandboxes at once">
+  <br/><em><code>go run ./parallel</code> &mdash; five languages, five cloud microVMs, in parallel.</em>
+</div>
 
-| Folder | Agent / kit | How you reach it |
-| --- | --- | --- |
-| [`agent-cli/claude`](agent-cli/claude) | Claude Code | `sbx --cloud attach` |
-| [`agent-cli/codex`](agent-cli/codex) | Codex | `sbx --cloud attach` |
-| [`agent-cli/opencode`](agent-cli/opencode) | OpenCode | `sbx --cloud attach` |
-| [`agent-cli/gemini`](agent-cli/gemini) | Gemini CLI | `sbx --cloud attach` |
-| [`agent-cli/codex-dhi`](agent-cli/codex-dhi) | Codex + Docker DHI (one-shot recipe) | `sbx --cloud attach` |
+## 🚀 Quick start
 
-The four agents are built-in cloud agents. `codex-dhi` is a recipe that wires
-several options at once (OpenAI + GitHub secrets, the Docker Hardened Images
-(DHI) MCP server, Balanced + dhi.io egress, micro, 1h) to mirror the Agentic
-Platform's "Welcome" card, and steers Codex to pull hardened base images from
-Docker DHI (dhi.io).
+Prerequisite: the [`sbx`](https://docs.docker.com/ai/sandboxes/get-started/) CLI, signed in
+with `sbx login`, and access to Docker Cloud Sandboxes (`sbx --cloud ls` should not error).
 
 ```bash
-cd agent-cli/codex
-./launch.sh                  # create the sandbox and print how to drive it
-./launch.sh -A               # create, then attach immediately
-./launch.sh -n my-demo -t 2h -s large
-./teardown.sh                # delete when done
+git clone https://github.com/ajeetraina/docker-cloud-sandboxes-demo.git
+cd docker-cloud-sandboxes-demo/agent-cli/codex
+
+./launch.sh                      # create a Codex cloud sandbox (micro, 4h TTL)
+sbx --cloud attach codex-demo    # drop into the agent's terminal
+./teardown.sh                    # delete it when you are done
 ```
 
-<img width="1807" height="456" alt="image" src="https://github.com/user-attachments/assets/bee94f0b-3951-46f5-baa8-698626a8e2d5" />
+> Cloud sandboxes bill while running (micro is about **$0.07/hr**) and auto-expire at
+> their TTL. Always tear down when finished.
 
+## 🧩 The demos
 
-## Common options
+One folder per demo, each with `launch.sh`, `teardown.sh`, and a focused `README.md`.
+They share one small library, [`lib/common.sh`](lib/common.sh), so each launcher stays short.
 
-Every `launch.sh` accepts these (defaults differ per demo, see `-h`):
+| Demo | Category | How you reach it | Status |
+| --- | --- | --- | --- |
+| [Claude Code](agent-cli/claude) | AI Coding Agent | `sbx --cloud attach` | scripted |
+| [OpenAI Codex](agent-cli/codex) | AI Coding Agent | `sbx --cloud attach` | ✅ verified |
+| [Gemini CLI](agent-cli/gemini) | AI Coding Agent | `sbx --cloud attach` | scripted |
+| [OpenCode](agent-cli/opencode) | AI Coding Agent | `sbx --cloud attach` | scripted |
+| [Codex + Docker DHI](agent-cli/codex-dhi) | Security & Governance | attach, then `/mcp` | ✅ verified |
+| [Go SDK · Hello](sdk/go/hello) | Programmatic | program stdout | ✅ verified |
+| [Go SDK · Parallel](sdk/go/parallel) | Programmatic | table + speedup | ✅ verified |
 
-| Option | Env override | Meaning |
-| --- | --- | --- |
-| `-n NAME` | `SBX_DEMO_NAME` | Sandbox name. `teardown.sh` reads the same variable. |
-| `-t TTL` | `SBX_DEMO_TTL` | Time to live, e.g. `90m`, `2h`. Hard cap 24h from creation. |
-| `-s SIZE` | `SBX_DEMO_SIZE` | `micro` (1 vCPU/2 GiB), `small` (2/4), `medium` (4/8), `large` (8/16), `xl` (16/32). |
-| `-e VAR` | - | Env var, `KEY=VALUE` or bare `KEY` (copied from your shell). Repeatable. |
+**Common options** (every `launch.sh`, see `-h`): `-n NAME`, `-t TTL`, `-s SIZE`
+(`micro`…`xl`), `-e KEY=VALUE`. The `agent-cli` demos add `-r URL` (clone a repo),
+`-k REF` (layer a kit), and `-A` (attach when ready).
 
-The `agent-cli` demos add `-r URL` (clone a repo), `-k REF` (layer a kit) and
-`-A` (attach when ready). `-h` prints the full list per launcher.
+## 🧠 How it works
 
-## Credentials: prefer secrets over env vars
+```mermaid
+flowchart LR
+  dev["Your Machine<br/><sub>sbx CLI · SDK</sub>"] --> plane["Cloud Control Plane<br/><sub>connect.docker.com</sub>"]
+  plane --> box["Cloud Sandbox<br/><sub>isolated microVM</sub>"]
+  box --> agent["AI Coding Agent"]
+  agent --> repo["Repo / App"]
+  box -.-> proxy["Credential Proxy"]
+  box -.-> net["Network Policy"]
+```
 
-The sandbox never sees the real value. The cloud proxy injects it into outbound
-requests to the matching service. Store them before launching (a secret only
-reaches sandboxes created afterwards):
+- **Isolation** — each sandbox is a separate microVM; work inside cannot touch your host or another sandbox.
+- **Credential proxy** — secrets are injected into outbound requests on the wire; the real value never enters the sandbox.
+- **Network policy** — allow-all / balanced / deny-all presets plus per-sandbox rules control egress.
+- **Lifecycle & TTL** — sandboxes auto-stop at their TTL (24h hard cap) and bill only while running.
+
+Explore an interactive version in the **[Web Portal](web)** (click any component to learn its role).
+
+## 🔐 Credentials: prefer secrets over env vars
+
+The sandbox never sees the real value — the cloud proxy injects it into outbound requests to
+the matching service. Store secrets **before** launching (a secret only reaches sandboxes
+created afterwards):
 
 ```bash
 sbx --cloud secret set anthropic --oauth          # Claude subscription (OAuth)
@@ -71,12 +119,19 @@ echo "$GEMINI_API_KEY" | sbx --cloud secret set google
 sbx --cloud secret ls
 ```
 
-## Drive it from code (Go SDK)
+## 🛡️ Security & governance demo
 
-The demos above use the `sbx` CLI. The same cloud sandboxes can be driven
-programmatically with the [Docker Sandboxes SDK](https://github.com/docker/sandboxes-api).
-[`sdk/go`](sdk/go) has runnable Go examples including a parallel fan-out that
-spins up several sandboxes at once (easy in code, awkward from the CLI):
+[`agent-cli/codex-dhi`](agent-cli/codex-dhi) is the flagship security demo: it launches Codex
+with **Balanced** network egress plus `dhi.io`, wires the **Docker Hardened Images** MCP
+server into Codex, and ships an `AGENTS.md` that steers the agent to prefer DHI for hardened
+base images. It also shows proxy-injected `X-Docker-*` headers so a Docker PAT never enters
+the sandbox.
+
+## ⚡ Drive it from code (Go SDK)
+
+The same cloud sandboxes can be driven programmatically with the
+[Docker Sandboxes SDK](https://github.com/docker/sandboxes-api). [`sdk/go`](sdk/go) has
+runnable Go examples, including a parallel fan-out that spins up several sandboxes at once.
 
 ```bash
 cd sdk/go
@@ -85,10 +140,22 @@ go run ./hello       # one sandbox: create -> run -> delete
 go run ./parallel    # N sandboxes at once, with a parallel-vs-sequential speedup
 ```
 
-The SDK ships for TypeScript, Python, and Go; these examples use Go (`go get`),
-and the REST API works for any language. See [`sdk/go/README.md`](sdk/go/README.md).
+The SDK ships for TypeScript, Python, and Go; these examples use Go (`go get`), and the REST
+API works for any language. See [`sdk/go/README.md`](sdk/go/README.md).
 
-## Cleaning up
+## 🖥️ Web portal
+
+A Next.js + TypeScript + Tailwind developer experience lives in [`web/`](web): a hero,
+interactive demo catalog with filters, and a clickable architecture diagram. Terminal
+walkthroughs there are **simulated** and create no cloud resources.
+
+```bash
+cd web
+npm install
+npm run dev          # http://localhost:3000
+```
+
+## 🧹 Cleaning up
 
 ```bash
 ./teardown.sh                 # inside a demo folder (uses that demo's default name)
@@ -96,12 +163,24 @@ sbx --cloud ls                # list everything still running
 sbx --cloud prune             # remove all stopped sandboxes
 ```
 
-Cloud sandboxes bill while they run and auto-expire at their TTL, but tear them
-down when finished so nothing lingers.
+## 🔧 Troubleshooting
 
-## Status
+| Symptom | Fix |
+| --- | --- |
+| `sbx --cloud ls` errors | Run `sbx login`; confirm your account has Cloud Sandboxes access. |
+| Agent "waiting for keys" | Store the provider secret **before** launch, then teardown + relaunch (secrets apply at create time). |
+| A sandbox already exists | `./teardown.sh -n NAME`, or launch with a different `-n`. |
+| Go SDK auth error | Use `DOCKER_USERNAME` + `DOCKER_PAT`, or a `DOCKER_ACCESS_TOKEN` JWT. |
+| `git commit` hangs | This repo enables SSH commit signing; commit with `--no-gpg-sign` if the key prompt blocks. |
 
-- [x] `agent-cli/codex` created, cloned a repo into it, verified running, torn down (live-tested).
-- [x] `agent-cli/codex-dhi` DHI MCP wired and used live (Codex recommended `dhi.io/nginx:...-fips` via the `dhi` tools).
-- [x] `sdk/go` Go SDK verified live: `hello` created a sandbox, ran Python, and auto-deleted it via PAT auth.
-- [ ] `agent-cli/claude`, `agent-cli/opencode`, `agent-cli/gemini` use the same path, not separately live-tested.
+## 🤝 Contributing & security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) to add a demo, and [SECURITY.md](SECURITY.md) to report
+a vulnerability. This is a community playground for Docker Cloud Sandboxes, not an official
+Docker product.
+
+## ✅ Verified vs scripted
+
+- **Verified** demos were run live end-to-end during development (create → use → teardown).
+- **Scripted** demos are complete and validated (syntax / compile) but were not separately
+  executed against the cloud. See each demo's README for details.
