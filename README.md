@@ -75,7 +75,7 @@ sbx --cloud secret ls
 
 The demos above use the `sbx` CLI. The same cloud sandboxes can be driven
 programmatically with the [Docker Sandboxes SDK](https://github.com/docker/sandboxes-api).
-[`sdk/go`](sdk/go) has runnable Go examples — including a parallel fan-out that
+[`sdk/go`](sdk/go) has runnable Go examples including a parallel fan-out that
 spins up several sandboxes at once (easy in code, awkward from the CLI):
 
 ```bash
