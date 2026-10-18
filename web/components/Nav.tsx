@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { REPO } from "@/data/demos";
-import { GitHub, Whale } from "./icons";
+import { GitHub } from "./icons";
 
 export function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-        <Link href="/" className="flex items-center gap-2.5 font-semibold text-slate-900">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-docker-blue text-white">
-            <Whale width={20} height={20} />
-          </span>
+        <Link href="/" className="font-semibold text-slate-900">
           <span className="leading-tight">
             Cloud Sandboxes
             <span className="block text-[11px] font-normal text-slate-500">Developer Playground</span>
