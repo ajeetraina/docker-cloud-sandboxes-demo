@@ -71,6 +71,23 @@ echo "$GEMINI_API_KEY" | sbx --cloud secret set google
 sbx --cloud secret ls
 ```
 
+## Drive it from code (Go SDK)
+
+The demos above use the `sbx` CLI. The same cloud sandboxes can be driven
+programmatically with the [Docker Sandboxes SDK](https://github.com/docker/sandboxes-api).
+[`sdk/go`](sdk/go) has runnable Go examples — including a parallel fan-out that
+spins up several sandboxes at once (easy in code, awkward from the CLI):
+
+```bash
+cd sdk/go
+export DOCKER_USERNAME=... DOCKER_PAT=...   # or DOCKER_ACCESS_TOKEN
+go run ./hello       # one sandbox: create -> run -> delete
+go run ./parallel    # N sandboxes at once, with a parallel-vs-sequential speedup
+```
+
+The TypeScript/Python packages are not on npm/PyPI yet, so Go (`go get`) and the
+REST API are the works-today paths. See [`sdk/go/README.md`](sdk/go/README.md).
+
 ## Cleaning up
 
 ```bash
