@@ -11,7 +11,6 @@ They share one small library, [`lib/common.sh`](lib/common.sh), for logging,
 preflight checks, the size table, and repo cloning, so each `launch.sh` stays
 short.
 
-Modeled on [`sbx-cloud-code-server-demo`](https://github.com/ajeetraina/sbx-cloud-code-server-demo).
 
 ## Requirements
 
