@@ -35,9 +35,9 @@ export function Hero() {
             Docker Cloud Sandboxes · Developer Playground
           </span>
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
-            Your AI Agents.
+            Give Your AI Agents a
             <br />
-            <span className="text-docker-blue">Their Own Cloud Sandboxes.</span>
+            <span className="text-docker-blue">Cloud Sandbox of Their Own.</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
             Explore, launch, and orchestrate AI coding agents in isolated Docker Cloud
