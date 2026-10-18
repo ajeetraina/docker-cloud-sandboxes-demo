@@ -121,7 +121,7 @@ fresh Codex session (the `+` tab in the web UI), then run `/mcp`.
 ## Make Codex prefer DHI
 
 Having the tools wired is not enough. Asked for a generic "hardened nginx",
-Codex tends to reach for Chainguard or Docker Hub (what its training associates
+Codex tends to reach for a third-party hardened registry (what its training associates
 with "hardened"), not DHI. So the script also writes a `~/workspace/AGENTS.md`
 telling Codex to use the `dhi` tools and prefer `dhi.io` for hardened images.
 
@@ -131,7 +131,7 @@ With that in place, a plain prompt works:
 
 Codex calls `dhi_list_repositories` / `dhi_get_repository` and recommends a real
 DHI image, e.g. `dhi.io/nginx:1.30.6-debian13-fips` (version-pinned, FIPS, zero
-known CVEs) instead of a Chainguard image.
+known CVEs) instead of a third-party hardened image.
 
 > Note: the `dhi` tools **discover and inspect** images (catalog, tags, SBOM,
 > CVEs, attestations). Actually `docker pull dhi.io/<img>` needs DHI entitlement

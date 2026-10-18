@@ -25,14 +25,13 @@ short.
 | [`agent-cli/codex`](agent-cli/codex) | Codex | `sbx --cloud attach` |
 | [`agent-cli/opencode`](agent-cli/opencode) | OpenCode | `sbx --cloud attach` |
 | [`agent-cli/gemini`](agent-cli/gemini) | Gemini CLI | `sbx --cloud attach` |
-| [`security/docker-scout`](security/docker-scout) | Docker Scout CLI | scan an image |
-| [`agent-cli/codex-dhi`](agent-cli/codex-dhi) | Codex + DHI (one-shot recipe) | `sbx --cloud attach` |
+| [`agent-cli/codex-dhi`](agent-cli/codex-dhi) | Codex + Docker DHI (one-shot recipe) | `sbx --cloud attach` |
 
-The four agents are built-in cloud agents. Docker Scout is the
-[`docker-scout`](https://github.com/ajeetraina/sbx-kits-scout) kit layered on
-the `docker-agent` base. `codex-dhi` is a recipe that wires several options at
-once (OpenAI + GitHub secrets, DHI MCP, Balanced + dhi.io egress, micro, 1h) to
-mirror the Agentic Platform's "Welcome" card.
+The four agents are built-in cloud agents. `codex-dhi` is a recipe that wires
+several options at once (OpenAI + GitHub secrets, the Docker Hardened Images
+(DHI) MCP server, Balanced + dhi.io egress, micro, 1h) to mirror the Agentic
+Platform's "Welcome" card, and steers Codex to pull hardened base images from
+Docker DHI (dhi.io).
 
 ```bash
 cd agent-cli/codex
@@ -57,8 +56,7 @@ Every `launch.sh` accepts these (defaults differ per demo, see `-h`):
 | `-e VAR` | - | Env var, `KEY=VALUE` or bare `KEY` (copied from your shell). Repeatable. |
 
 The `agent-cli` demos add `-r URL` (clone a repo), `-k REF` (layer a kit) and
-`-A` (attach when ready). `docker-scout` adds `-i IMAGE` and `-S` (scan during
-launch). `-h` prints the full list per launcher.
+`-A` (attach when ready). `-h` prints the full list per launcher.
 
 ## Credentials: prefer secrets over env vars
 
@@ -87,5 +85,5 @@ down when finished so nothing lingers.
 ## Status
 
 - [x] `agent-cli/codex` created, cloned a repo into it, verified running, torn down (live-tested).
+- [x] `agent-cli/codex-dhi` DHI MCP wired and used live (Codex recommended `dhi.io/nginx:...-fips` via the `dhi` tools).
 - [ ] `agent-cli/claude`, `agent-cli/opencode`, `agent-cli/gemini` use the same path, not separately live-tested.
-- [ ] `security/docker-scout` scripted, not yet live-tested.

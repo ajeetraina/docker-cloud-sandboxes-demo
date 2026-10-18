@@ -106,7 +106,7 @@ if [ -n "$MCP" ]; then
   fi
 
   # Steer Codex to actually USE the DHI tools. Without this, a request like
-  # "pull a hardened nginx" resolves to Chainguard/Docker Hub from training, not
+  # "pull a hardened nginx" resolves to a third-party hardened registry from training, not
   # DHI. The steering text lives in AGENTS.md beside this script; deploy it to
   # the Codex workspace (~/workspace/AGENTS.md), which Codex reads at session start.
   if [ -f "$HERE/AGENTS.md" ]; then
