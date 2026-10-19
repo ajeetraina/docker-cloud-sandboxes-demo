@@ -1,0 +1,133 @@
+# syntax=docker/sandbox-kit:3
+
+# Docker Hardened Images (DHI) as a MIXIN. Wires any agent (codex, claude) to
+# the hosted DHI MCP server at dhi.io, steers it to prefer DHI for hardened
+# base images, and blocks competitor registries at the network edge so a
+# drifting agent cannot pull from them even if the steering is ignored.
+#
+# This packages, declaratively, what agent-cli/codex-dhi/launch.sh used to do by
+# hand: register the MCP server, allow egress to dhi.io, inject the Docker Hub
+# credentials the mirror tools need, deny Chainguard/Wolfi, and drop the DHI
+# steering. Compose it: `sbx run <agent-workload> --kit ./dhi-mixin .`
+schemaVersion: "3"
+kind: mixin
+
+displayName: Docker Hardened Images (DHI)
+author: "Ajeet Singh Raina"
+description: >-
+  Wires an agent to the hosted Docker Hardened Images MCP server (dhi.io),
+  steers it to prefer DHI for hardened base images, and denies competitor
+  registries (Chainguard/Wolfi) at the network edge. The kit holds no token:
+  bind Docker Hub creds with `sbx secret set dhi-mcp-user` / `dhi-mcp-pat` to
+  enable the DHI mirror tools; without them the read-only DHI tools still work.
+sourceUrl: https://github.com/ajeetraina/docker-cloud-sandboxes-demo
+version: "1.0.0"
+licenses:
+  - Apache-2.0
+
+args:
+  # The DHI MCP endpoint. Resolves at CREATE (not build) and is exported into
+  # the sandbox as DHI_MCP_URL, so one published kit can point at a different
+  # endpoint without a rebuild:
+  # `sbx run ... --kit ./dhi-mixin --kit-arg mcpUrl=https://dhi.io/mcp`.
+  mcpUrl:
+    default: "https://dhi.io/mcp"
+    pattern: '^https://[A-Za-z0-9.-]+(:[0-9]+)?(/.*)?$'
+    description: >-
+      DHI MCP server endpoint registered with the agent. Must be an https URL
+      on a host covered by the network-policy allow list below (dhi.io).
+    env: DHI_MCP_URL
+
+capabilities:
+  # --- Network policy -------------------------------------------------------
+  # Allow the agent to reach the DHI MCP server, and DENY the competitor
+  # registries. Deny takes precedence over allow (even over an allow-all base),
+  # so the Chainguard/Wolfi block holds no matter what policy the composed
+  # workload ships. DHI image pulls go through Docker Hub, which the base
+  # workload's own policy allows, so they are untouched here. dhi.io is also the
+  # credential inject domain below, so it must appear in this allow list.
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - dhi.io
+        deny:
+          - cgr.dev              # Chainguard registry
+          - "*.cgr.dev"
+          - chainguard.dev       # Chainguard catalog / redirects
+          - "*.chainguard.dev"
+          - wolfi.dev            # Wolfi (Chainguard's distro) apk repos
+          - "*.wolfi.dev"
+          - apk.dag.dev          # Wolfi apk mirror
+
+  # --- Credentials (mirror tools, opt-in) -----------------------------------
+  # The DHI mirror tools (dhi_create_mirror, etc.) need Docker Hub creds sent as
+  # X-Docker-* headers. Two inject-only credentials: no value lands in the
+  # sandbox; the sbx proxy presents each secret on the wire to dhi.io only. Both
+  # optional: without them the read-only DHI tools still work, matching the
+  # script's "DHI read-only tools only" fallback. Bind on the host with
+  # `sbx secret set dhi-mcp-user` and `sbx secret set dhi-mcp-pat`.
+  - type: com.docker.sandbox/credential@1
+    optional: true
+    description: Docker Hub username, injected as X-Docker-Username on dhi.io for the DHI mirror tools
+    config:
+      service: dhi-mcp-user
+      phase: runtime
+      apiKey:
+        inject:
+          - {domain: dhi.io, header: X-Docker-Username, format: "%s"}
+
+  - type: com.docker.sandbox/credential@1
+    optional: true
+    description: Docker Hub PAT, injected as X-Docker-Pat on dhi.io for the DHI mirror tools
+    config:
+      service: dhi-mcp-pat
+      phase: runtime
+      apiKey:
+        inject:
+          - {domain: dhi.io, header: X-Docker-Pat, format: "%s"}
+
+  # --- Lifecycle ------------------------------------------------------------
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      startup:
+        # Register the DHI MCP server with whichever agent is present. The DHI
+        # MCP is read-only and needs no auth, so this is a plain registration.
+        # Best-effort: no-op if the agent binary is absent, and `|| true` keeps
+        # a re-add (the add verbs are not idempotent) from failing the boot. A
+        # NEW agent session then picks up the server.
+        - command: |
+            if command -v codex >/dev/null 2>&1; then
+              codex mcp add dhi --url "$DHI_MCP_URL" >/dev/null 2>&1 || true
+            fi
+            if command -v claude >/dev/null 2>&1; then
+              claude mcp add --transport http dhi "$DHI_MCP_URL" >/dev/null 2>&1 || true
+            fi
+          user: "1000"
+          env: [DHI_MCP_URL]
+          description: Register the DHI MCP server with codex/claude (best-effort; no-op elsewhere)
+      files:
+        # Portable MCP definition for any agent that reads an mcpServers block.
+        # overwrite: false so a copy the user has edited survives a recreate.
+        - path: /home/agent/.dhi/mcp.json
+          mode: "0644"
+          overwrite: false
+          description: Portable DHI MCP definition for agents that read an mcpServers block
+          content: |
+            {
+              "mcpServers": {
+                "dhi": {
+                  "type": "http",
+                  "url": "${{ kit.args.mcpUrl }}"
+                }
+              }
+            }
+
+  # --- Agent context --------------------------------------------------------
+  # The DHI steering. Contributes instructions the agent reads; the host places
+  # the body where the specific agent looks (AGENTS.md for codex, CLAUDE.md for
+  # claude), so this is more portable than the script's hardcoded AGENTS.md
+  # drop. A mixin owns no profile, so contentFile alone (no filename).
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./dhi-context.md
