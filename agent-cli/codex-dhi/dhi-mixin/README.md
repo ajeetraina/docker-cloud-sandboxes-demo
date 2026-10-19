@@ -29,15 +29,30 @@ Without them the read-only DHI tools still work.
 ## Use it
 
 ```sh
-# Compose onto an agent workload (local or cloud):
-sbx run codex --kit ./dhi-mixin .
-sbx --cloud run -d --name codex-dhi-demo --kit ./dhi-mixin codex
-
-# Point at a different endpoint without a rebuild:
-sbx run codex --kit ./dhi-mixin --kit-arg mcpUrl=https://dhi.io/mcp .
+# Local: compose onto a workload kit (this is what `sbx run --kit` assembles):
+sbx run docker/sbx-kit-shell --kit ./dhi-mixin /tmp/ws
 
 # See the resolved declarations without starting a sandbox:
 sbx kit inspect ./dhi-mixin
+```
+
+### In the cloud
+
+Cloud composes a mixin onto a built-in agent only from a **published OCI ref** —
+a local path or git ref is uploaded as its own template and the cloud resolver
+refuses to assemble it with the agent. So publish first, then either call sbx
+directly or pass the ref to `launch.sh -k`:
+
+```sh
+# Publish (needs a Read/Write Docker Hub PAT):
+docker buildx build . -f dhi-mixin.yaml --platform linux/amd64,linux/arm64 --push \
+  -t docker.io/<user>/dhi-mixin:1.0.0 -t docker.io/<user>/dhi-mixin:latest
+
+# Then, directly:
+sbx --cloud run -d --name codex-dhi-demo --kit docker.io/<user>/dhi-mixin:1.0.0 codex
+
+# ...or through the demo launcher (kit mode skips the imperative wiring):
+../launch.sh -k docker.io/<user>/dhi-mixin:1.0.0
 ```
 
 In the agent, open a NEW session (so it loads the MCP server) and the `dhi`
