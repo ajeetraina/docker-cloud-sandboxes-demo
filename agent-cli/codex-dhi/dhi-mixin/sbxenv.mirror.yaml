@@ -1,0 +1,19 @@
+# Opt-in overlay for the DHI *mirror* tools (dhi_create_mirror, dhi_list_mirrors,
+# dhi_remove_mirror). Layer it on top of sbxenv.yaml, docker-compose style:
+#
+#   export DOCKER_USERNAME=... DOCKER_PAT=...
+#   sbx env run ./sbxenv.yaml ./sbxenv.mirror.yaml
+#
+# The two secrets merge into the base file's secrets map. The DHI mixin owns the
+# inject rules (service dhi-mcp-user / dhi-mcp-pat -> X-Docker-* headers on
+# dhi.io), so these are provisioned as plain secrets; the PAT never enters the
+# sandbox. Both are required here (:?), since you only add this file when you
+# have the credentials. Without this overlay the read-only DHI tools still work.
+schemaVersion: "1"
+name: codex-dhi-demo
+
+secrets:
+  dhi-mcp-user:
+    command: printf '%s' "${DOCKER_USERNAME:?export DOCKER_USERNAME for the DHI mirror tools}"
+  dhi-mcp-pat:
+    command: printf '%s' "${DOCKER_PAT:?export DOCKER_PAT for the DHI mirror tools}"

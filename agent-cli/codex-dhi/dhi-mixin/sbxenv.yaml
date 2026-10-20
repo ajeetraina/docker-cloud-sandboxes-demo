@@ -1,0 +1,80 @@
+# Docker Sandboxes environment for the codex + DHI mixin demo.
+#
+# This is the declarative version of ../launch.sh: instead of passing flags to
+# `sbx run`, it names the codex workload, composes the DHI mixin in this folder
+# on top, mounts a workspace, and provisions the secrets the demo needs. One
+# file, reproducible.
+#
+# From this directory on the host:
+#   sbx env plan    # preview the setup without changing anything
+#   sbx env run     # provision secrets + create the sandbox, then attach
+#   sbx env rm      # remove the sandbox and the secrets scoped to it
+#
+# Before the first run:
+#   1. sbx login
+#   2. export OPENAI_API_KEY and GITHUB_TOKEN in your shell (read below).
+#   3. Optional, for the DHI mirror tools: export DOCKER_USERNAME + DOCKER_PAT.
+#
+# `sbx env` is experimental and runs local sandboxes. For the cloud demo, keep
+# using ../launch.sh -k <published-oci-ref> (see ./README.md).
+schemaVersion: "1"
+
+# Sandbox name and the scope key for the secrets provisioned below, so
+# `sbx env rm` can clean them all up.
+name: codex-dhi-demo
+
+# The handle sbx derives from the codex workload kit's manifest name. The kit
+# reference itself lives under kits: below.
+agent: sbx-kit-codex
+
+kits:
+  # The published Codex v3 workload this composes onto. Bump the tag as new
+  # Codex kits ship (docker.io/docker/sbx-kit-codex).
+  - source: docker/sbx-kit-codex:0.162.1
+
+  # The DHI mixin in this folder. It registers the DHI MCP server, allows
+  # dhi.io egress, denies Chainguard/Wolfi at the network edge, and steers the
+  # agent to prefer DHI. The default mcpUrl (https://dhi.io/mcp) applies;
+  # override it with an args: block if you point at a different endpoint.
+  - source: .
+    # args:
+    #   mcpUrl: https://dhi.io/mcp
+
+# Mount this folder read/write as the agent's workspace. Point this at your own
+# project to have Codex pick DHI base images for real work.
+workspace: .
+
+# Create-time knobs, matching the demo's micro profile in launch.sh.
+sandboxOptions:
+  cpus: 1
+  memory: 2g
+  pullPolicy: always  # re-resolve each kit tag on every create
+
+# Secrets provisioned into the credential store at this sandbox's scope. The
+# values come from your shell environment, so nothing secret is committed here.
+# sbx verifies each command secret and rejects an empty result, so this base
+# file provisions only the two Codex always needs. The DHI mirror tools are
+# opt-in: layer sbxenv.mirror.yaml on top to add their credentials, e.g.
+#   sbx env run ./sbxenv.yaml ./sbxenv.mirror.yaml
+# Without that overlay the read-only DHI tools still work.
+secrets:
+  # Required: Codex authenticates with your OpenAI key.
+  openai:
+    command: printf '%s' "${OPENAI_API_KEY:?export OPENAI_API_KEY first}"
+
+  # Repo access for Codex (gh and the GitHub REST API).
+  github:
+    command: printf '%s' "${GITHUB_TOKEN:?export GITHUB_TOKEN first}"
+
+# Approve which stored credential the proxy may present, and where. These
+# domains match what the codex workload and the DHI mixin reach.
+bindings:
+  openai:
+    apiKey:
+      domains:
+        - api.openai.com
+  github:
+    apiKey:
+      domains:
+        - api.github.com
+        - github.com

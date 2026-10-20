@@ -36,6 +36,33 @@ sbx run docker/sbx-kit-shell --kit ./dhi-mixin /tmp/ws
 sbx kit inspect ./dhi-mixin
 ```
 
+### One file: `sbxenv.yaml`
+
+[`sbxenv.yaml`](./sbxenv.yaml) is the declarative version of
+[`../launch.sh`](../launch.sh): it names the Codex workload, composes this
+mixin on top, mounts a workspace, and provisions the demo secrets. Run it from
+this folder:
+
+```sh
+export OPENAI_API_KEY=... GITHUB_TOKEN=...   # required by Codex
+
+sbx env plan    # preview; changes nothing
+sbx env run     # provision secrets + create the sandbox, then attach
+sbx env rm      # remove the sandbox and its scoped secrets
+```
+
+That gives you the read-only DHI tools. To also enable the DHI **mirror** tools,
+layer [`sbxenv.mirror.yaml`](./sbxenv.mirror.yaml) on top (docker-compose style,
+later file wins):
+
+```sh
+export DOCKER_USERNAME=... DOCKER_PAT=...
+sbx env run ./sbxenv.yaml ./sbxenv.mirror.yaml
+```
+
+`sbx env` is experimental and runs a local sandbox. For the cloud demo, keep
+using `../launch.sh -k <published-oci-ref>` below.
+
 ### In the cloud
 
 Cloud composes a mixin onto a built-in agent only from a **published OCI ref** —
