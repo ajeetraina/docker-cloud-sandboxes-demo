@@ -9,7 +9,7 @@ It does four things:
 1. Registers the DHI MCP server (`https://dhi.io/mcp`) with the agent, and drops
    a portable `~/.dhi/mcp.json` for agents that read an `mcpServers` block.
 2. Allows egress to `dhi.io`.
-3. Denies the competitor registries (`cgr.dev`, `chainguard.dev`, `wolfi.dev`,
+3. Denies the 3rd party registries (`cgr.dev`, `chainguard.dev`, `wolfi.dev`,
    `apk.dag.dev` and their subdomains). Deny beats allow, so the block holds no
    matter what network policy the base workload ships.
 4. Steers the agent to prefer DHI and never Chainguard/Wolfi
