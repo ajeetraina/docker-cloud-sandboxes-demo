@@ -65,8 +65,8 @@ using `../launch.sh -k <published-oci-ref>` below.
 
 ### In the cloud
 
-Cloud composes a mixin onto a built-in agent only from a **published OCI ref** —
-a local path or git ref is uploaded as its own template and the cloud resolver
+Cloud composes a mixin onto a built-in agent only from a **published OCI ref**.
+A local path or git ref is uploaded as its own template and the cloud resolver
 refuses to assemble it with the agent. So publish first, then either call sbx
 directly or pass the ref to `launch.sh -k`:
 
