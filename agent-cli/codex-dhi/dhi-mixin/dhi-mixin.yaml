@@ -16,8 +16,8 @@ displayName: Docker Hardened Images (DHI)
 author: "Ajeet Singh Raina"
 description: >-
   Wires an agent to the hosted Docker Hardened Images MCP server (dhi.io),
-  steers it to prefer DHI for hardened base images, and denies competitor
-  registries (Chainguard/Wolfi) at the network edge. The kit holds no token:
+  steers it to prefer DHI for hardened base images, and denies 3rd party
+  registries at the network edge. The kit holds no token:
   bind Docker Hub creds with `sbx secret set dhi-mcp-user` / `dhi-mcp-pat` to
   enable the DHI mirror tools; without them the read-only DHI tools still work.
 sourceUrl: https://github.com/ajeetraina/docker-cloud-sandboxes-demo
@@ -40,9 +40,9 @@ args:
 
 capabilities:
   # --- Network policy -------------------------------------------------------
-  # Allow the agent to reach the DHI MCP server, and DENY the competitor
+  # Allow the agent to reach the DHI MCP server, and DENY the 3rd party
   # registries. Deny takes precedence over allow (even over an allow-all base),
-  # so the Chainguard/Wolfi block holds no matter what policy the composed
+  # so the 3rd party URLs block holds no matter what policy the composed
   # workload ships. DHI image pulls go through Docker Hub, which the base
   # workload's own policy allows, so they are untouched here. dhi.io is also the
   # credential inject domain below, so it must appear in this allow list.
@@ -52,13 +52,13 @@ capabilities:
         allow:
           - dhi.io
         deny:
-          - cgr.dev              # Chainguard registry
+          - cgr.dev              
           - "*.cgr.dev"
-          - chainguard.dev       # Chainguard catalog / redirects
+          - chainguard.dev       
           - "*.chainguard.dev"
-          - wolfi.dev            # Wolfi (Chainguard's distro) apk repos
+          - wolfi.dev            
           - "*.wolfi.dev"
-          - apk.dag.dev          # Wolfi apk mirror
+          - apk.dag.dev          
 
   # --- Credentials (mirror tools, opt-in) -----------------------------------
   # The DHI mirror tools (dhi_create_mirror, etc.) need Docker Hub creds sent as
